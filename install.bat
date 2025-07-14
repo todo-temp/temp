@@ -7,7 +7,7 @@ IF %errorlevel% equ 0 (
 	goto installed
 )
 cls
-echo "Python is not installed, please reffer to: https://www.python.org/downloads/"
+echo "Python is not installed, please refer to: https://www.python.org/downloads/"
 set /p temp=
 exit
 :installed
