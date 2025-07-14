@@ -111,10 +111,13 @@ while True:
                 templates_.append(template + ",")
                 templates.append(f"$~ {template}  |Written|")
                 time.sleep(0.6)
-        msg.append("template created")
-        templates_.pop(-1)
-        with open("template.cfg", "w", encoding="utf-8") as file:
-            file.writelines(templates_)
+        if len(templates_) != 0:
+            msg.append("template created")
+            templates_.pop(-1)
+            with open("template.cfg", "w", encoding="utf-8") as file:
+                file.writelines(templates_)
+        else:
+            msg.append("template creation skipped...")
     check()
     if len(msg) == 5:
         msg.append("Downloading main script")
