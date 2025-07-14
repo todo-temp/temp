@@ -156,6 +156,7 @@ while True:
         os.system('echo Set objShell = CreateObject("WScript.Shell") > completed.vbs')
         os.system('echo objShell.Popup "installation completed!", 0, "Info", 64 >> completed.vbs')
         os.system("completed.vbs")
+        time.sleep(3)
         os.system("del completed.vbs")
         os.system("del installer.py")
         break
