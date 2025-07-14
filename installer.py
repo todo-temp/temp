@@ -158,6 +158,7 @@ while True:
         os.system("completed.vbs")
         os.system("del completed.vbs")
         os.system("del installer.py")
+        break
 
     
 
