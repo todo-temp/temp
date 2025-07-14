@@ -151,6 +151,7 @@ while True:
     check()
     if len(msg) == 7:
         msg.append("Creating specialized dir")
+        os.system("mkdir weeks")
 
     
 
