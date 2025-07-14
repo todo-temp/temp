@@ -93,7 +93,19 @@ while True:
             lines[i] = f"{i + 1};{"".join(day)}\n"
             with open("toDo.cfg", "w", encoding="utf-8") as file:
                 file.writelines(lines)
-        msg.append("Scheme created")
+        empty = False
+        for line in lines:
+            try:
+                if line.split(f"{lines.index(line)};")[1] != "" and empty == False:
+                    empty = False
+                else:
+                    empty = True
+            except IndexError:
+                empty = True
+        if empty == False:
+            msg.append("Scheme created")
+        else:
+            msg.append("Scheme creation skipped...")
     check()
     if len(msg) == 4:
         clear()
@@ -121,7 +133,7 @@ while True:
     check()
     if len(msg) == 5:
         msg.append("Downloading main script")
-        ##Download process
+        os.system("curl https://raw.githubusercontent.com/todo-temp/temp/main/main.py -o main.py")
     check()
     if len(msg) == 6:
         msg.append("Creating Symlink")
