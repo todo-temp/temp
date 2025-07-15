@@ -1,6 +1,7 @@
 import os, time
 import winreg
 import win32com.client
+from datetime import datetime
 
 def get_desktop_path():
     key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
@@ -130,6 +131,10 @@ while True:
                 file.writelines(templates_)
         else:
             msg.append("template creation skipped...")
+        now = datetime.now()
+        date = now.split(" ")[0]
+        with open("start.cfg", "w", encoding="utf-8") as file:
+            file.write(date)
     check()
     if len(msg) == 5:
         msg.append("Downloading main script")
@@ -148,6 +153,7 @@ while True:
         shortcut_name = "ToDo-app.lnk"
         shortcut_file = os.path.join(desktop_path, shortcut_name)
         create_shortcut(target_exe, shortcut_file)
+        
     check()
     if len(msg) == 7:
         msg.append("Creating specialized dir")
