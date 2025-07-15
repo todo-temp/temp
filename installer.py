@@ -132,7 +132,7 @@ while True:
         else:
             msg.append("template creation skipped...")
         now = datetime.now()
-        date = now.split(" ")[0]
+        date = str(now).split(" ")[0]
         with open("start.cfg", "w", encoding="utf-8") as file:
             file.write(date)
     check()
