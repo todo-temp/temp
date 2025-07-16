@@ -1,30 +1,110 @@
 import os
 from datetime import datetime
+import time
 import sys
-days = ["Pondělí", "Úterý", "Středa", "Čtvrtek", "Pátek", "Sobota", "noděle"]
 def clear():
     os.system("cls")
+os.system(r"cd %appdata%\\Todo-app\\")
+try:
+    with open("toDo.cfg.next", "r", encoding="utf-8") as file:
+        file.readlines()
+except FileNotFoundError:
+    with open("toDo.cfg.next", "w", encoding="utf-8") as file:
+        file.write("1;\n2;\n3;\n4;\n5;\n6;\n7;") 
+
+days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+now = datetime.now()
+year = int(str(now).split(" ")[0].split("-")[0])
+month = int(str(now).split(" ")[0].split("-")[1])
+day = str(now).split(" ")[0].split("-")[2]
+weekday = days[now.weekday()]
+try:
+    with open("free-time.cfg", "r", encoding="utf-8") as file:
+        line = file.readlines()[0]
+    if str(line.strip()) != str(now).split(" ")[0]:
+        os.remove("free-time.cfg")
+except FileNotFoundError:
+    pass
+with open("start.cfg", "r", encoding="utf-8") as file:
+    line = str(file.readlines()[0])
+count = 0
+rounds = 0
+if year % 4 == 0:
+    months = [31,29,31,30,31,30,31,31,30,31,30,31]
+else:
+    months = [31,28,31,30,31,30,31,31,30,31,30,31]
+while year != int(line.split("-")[0]):
+    rounds += 1
+    if year % 4 == 0:
+        months = [31,29,31,30,31,30,31,31,30,31,30,31]
+    else:
+        months = [31,28,31,30,31,30,31,31,30,31,30,31]
+    if rounds >= 2:
+        for num in months:
+            count += num
+    else:
+        rounds = 0
+        while month != 1:
+            rounds += 1
+            if rounds >= 2:
+                count += months[month - 1]
+            else:
+                count += int(day)
+            month -= 1
+        count += 1  
+    year -= 1  
+if rounds >= 1:
+    month = 12
+    day = 31 
+    count += 30
+rounds = 0
+while month != int(line.split("-")[1]):
+    rounds += 1
+    month -= 1
+    if rounds >= 2:
+        count += months[month]
+    else:
+        count += int(day)
+if rounds >= 1:
+    count += months[month - 1] - int(line.split("-")[2])
+else:
+    count += int(day) - int(line.split("-")[2])
+start_day = days[days.index(weekday) - (count % 7)]
+if count // 7 > 0:
+    temp = count // 7
+    error = 0
+    for i in range(temp):
+        try:
+            with open(f".\\weeks\\{i + 1}.week.cfg", "r", encoding="utf-8") as file:
+                line = file.readlines()
+        except FileNotFoundError:
+            error += 1
+    if error == 1:    
+        os.system(f"ren toDo.cfg {count // 7}.week.cfg & move {count // 7}.week.cfg weeks & ren toDo.cfg.next toDo.cfg")
+    elif error >= 2:
+        clear()
+        input("Weeks missing...")
+        sys.exit()
 end = ""
 while end.lower() != "q":
     clear()
-    end = input("\t\tMENU\t\t\n\n|1| -> |Show all weeks|\n|2| -> |Show top 10 tasks|\n|3| -> |Search for specific task|\n|4| -> |Today's tasks|\n|q| -> |Quit|\n$~ ")
+    end = input("\t\tMENU\t\t\n\n|1| -> |Show all weeks|\n|2| -> |Show top 10 tasks|\n|3| -> |Search for specific task|\n|4| -> |Today's tasks|\n|5| -> |Edit planned tasks|\n|6| -> |Edit template|\n|q| -> |Quit|\n$~ ")
     msg = []
     sum = []
     num = []
-    files = [f for f in os.listdir('.\\weeks') if os.path.isfile(os.path.join('.\\weeks', f))]
-    for file in files:
-        if file != "counter.py":
-            count = 0
+    if count // 7 >= 1:
+        for i in range(count // 7):
+            count_tasks = 0
             try:
-                with open(f".\weeks\{file}", "r", encoding="utf-8") as file:
+                with open(f".\\weeks\\{i + 1}.week.cfg", "r", encoding="utf-8") as file:
                     linos = file.readlines()
                     for lino in linos:
                         try:
                             main = lino.split(";")[1].split(",")
                             for contents in main:
                                 try:
-                                    if contents.split(":")[1].strip().lower() == "dono":
-                                        count += 1
+                                    if contents.split(":")[1].strip().lower() == "done":
+                                        count_tasks += 1
                                         if contents.split(":")[0].strip().lower() not in sum:
                                             sum.append(contents.split(":")[0].strip().lower())
                                             num.append(1)
@@ -34,20 +114,19 @@ while end.lower() != "q":
                                     pass
                         except IndexError:
                             pass
-                msg.append(f"file {file} consists of  {count} dono tasks")
+                msg.append(f"{i + 1}. Week consists of {count_tasks} done tasks")
             except FileNotFoundError:
-                pass
+                msg = ["Some weeks are missing..."]
+                break
                     
     i = 0
     if "1" == end:
         clear()
-        if len(files) == 0:
+        if count // 7 == 0:
             print("No data...")
-        for i in range(len(files)):
-            for file in files:
-                if file.split(".")[0] == f"{i+1}":
-                    print(msg[files.index(file)])
-            i += 1
+        else:
+            for ms in msg:
+                print(ms)
         input()
         clear()
     msg = []
@@ -55,23 +134,23 @@ while end.lower() != "q":
         msg.append(f"{content} -> {num[sum.index(content)]}")
     save = num
     num.sort(reverse=True)
-    dono = []
+    done = []
     if "2" == end:
         clear()
-        if len(files) == 0:
+        if count // 7 == 0:
             print("No data...")
         else:
             print("10 popular tasks:")
         for i in range(10):
             for message in msg:
-                if message.split("-> ")[1] == str(num[i]) and message not in dono:
+                if message.split("-> ")[1] == str(num[i]) and message not in done:
                     print(f"{i + 1}: {message}")
-                    dono.append(message)
+                    done.append(message)
         input()
         clear()
     if "3" == end:
         clear()
-        if len(files) == 0:
+        if count // 7 == 0:
             print("No data...")
         else:
             find = input("Search for tasks:")
