@@ -2,19 +2,6 @@ import os, time
 import winreg
 import win32com.client
 from datetime import datetime
-
-def get_desktop_path():
-    key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
-                         r'Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders')
-    desktop, _ = winreg.QueryValueEx(key, 'Desktop')
-    winreg.CloseKey(key)
-    desktop = os.path.expandvars(desktop)
-    return desktop
-import os, time
-import winreg
-import win32com.client
-from datetime import datetime
-
 def get_desktop_path():
     key = winreg.OpenKey(winreg.HKEY_CURRENT_USER,
                          r'Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders')
@@ -149,7 +136,27 @@ while True:
         try:
             with open("template.cfg", "r", encoding="utf-8") as file:
                 lines = file.readlines()
-        except FileNotFoundError:           
+                msg.append("template allready exists...")
+        except FileNotFoundError:
+            if exists == True:
+                write = []
+                def greet():
+                    print(f"Let's make your first template:")
+                for letter in list("ex. $~ Chess rematch"):
+                    clear()
+                    greet()
+                    write.append(letter)
+                    print("".join(write))
+                    if len(write) % 5 == 0:
+                        time.sleep(0.6)
+                    else:
+                        time.sleep(0.2)
+                clear()
+                greet()
+                print("ex. $~ Chess rematch   |Written|")
+                print("Q to quit planning")
+                time.sleep(0.5)
+                input("\ngot it? (Enter to proceed)")
             clear()
             template = ""
             templates = ["Enter as before\n"]
@@ -171,9 +178,9 @@ while True:
                 with open("template.cfg", "w", encoding="utf-8") as file:
                     file.writelines(templates_)
             else:
+                with open("template.cfg", "w", encoding="utf-8") as file:
+                    file.write("")
                 msg.append("template creation skipped...")
-    else:
-        msg.append("template already exists...")
     try:
         with open("start.cfg", "r", encoding="utf-8") as file:
             lines = file.readlines()
