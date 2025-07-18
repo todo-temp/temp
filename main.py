@@ -241,4 +241,41 @@ while end.lower() != "q":
                         input("Index Error")
             except ValueError:
                 pass
+    if end == "6":
+        temp = ""
+        while temp.lower() != "q":
+            clear()
+            print(f"Enter task name(If task is already in -> task is deleted, else the task is created)\n   |q to quit|")
+            try:
+                with open("template.cfg", "r", encoding="utf-8") as file:
+                    line = file.readlines()
+            except FileNotFoundError:
+                with open("template.cfg", "w", encoding="utf-8") as file:
+                    file.write("")
+                    line = []
+            if line != []:
+                for task in line[0].split(","):
+                    if task != "":
+                        print(f"{line[0].split(",").index(task) + 1}. {task}")
+            temp = input("$~ ")
+            if temp.lower() != "q":
+                temp_list = []
+                deleted = False
+                if line != []:
+                    temp_list = line[0].split(",")
+                    for task in temp_list:
+                        if task.lower() == temp.lower():
+                            temp_list.pop(temp_list.index(task))
+                            deleted = True
+                main_list = []
+                for task in temp_list:
+                    if task != "," and task != "" and task != " ":
+                        main_list.append(f"{task},")
+                if deleted == False:
+                    main_list.append(f"{temp},")
+                with open("template.cfg", "w", encoding="utf-8") as file:
+                    file.write("".join(main_list))
+
+
+            
 
