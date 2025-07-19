@@ -155,7 +155,7 @@ while end.lower() != "q":
         else:
             find = input("Search for tasks:")
             text = list(find.lower())
-            nasel = 0
+            found = 0
             for message in msg:
                 cor = 0
                 saved = message
@@ -176,8 +176,8 @@ while end.lower() != "q":
                         bad = True
                 if right >= len(find) * 0.5 and cor >= len(find) * 0.5 or cor >= len(find) * 0.8 and right >= 2:
                     print(f"{message} -> {saved.split("-> ")[1]}")
-                    nasel += 1
-            if nasel == 0:
+                    found += 1
+            if found == 0:
                 print("Nothing corresponds to your search")
         input()
         clear()
@@ -192,15 +192,14 @@ while end.lower() != "q":
             try:
                 with open("toDo.cfg", "r", encoding="utf-8") as file:
                     linos = file.readlines()
-                    no = False
-                    print(f"day: {day}\nhour: {hour}\n{"=" * (len(day) + len("day: "))}")
+                    print(f"{" "* ((len("|Enter number of done task to mark/unmark it as completed|") - len(f"day: {day}")) // 2)}day: {day}\n{" "* ((len("|Enter number of done task to mark/unmark it as completed|") - len(f"hour: {hour}")) // 2)}hour: {hour}\n{"=" * (len("|Enter number of done task to mark/unmark it as completed|"))}\n|Enter number of done task to mark/unmark it as completed|\n|Enter q to quit|\n{"=" * (len("|Enter number of done task to mark/unmark it as completed|"))}")
                     for line in linos:
                         line = line.strip()
                         day = line.split(";")[0]
                         if int(day) == now.weekday() + 1:
                             saved = int(day)
-                            no = True
                             tasks = line.split(";")[1].split(",")
+                            printed = False
                             for task in tasks:
                                 if task == "":
                                     break
@@ -213,34 +212,55 @@ while end.lower() != "q":
                                     else:
                                         two = "✘"
                                     print(f"{tasks.index(task) + 1}.{one} {two}") 
+                                    printed = True
                                 except IndexError:
                                     print(f"{tasks.index(task) + 1}.{task} ✘")  
-                    if no == False:
-                        print("Free time")
+                                    printed = True
+                            if printed == False:
+                                clear()
+                                with open("template.cfg", "r", encoding="utf-8") as file:
+                                    lines = file.readlines()
+                                    try:
+                                        line = lines[0]
+                                    except IndexError:
+                                        line = ""
+                                if line != "":
+                                    q1 = input("No plan for today, do you want to apply your template?(y/n)\n$~ ")
+                                    if q1.lower() == "y":
+                                        with open("toDo.cfg", "r", encoding="utf-8") as file:
+                                            lines = file.readlines()
+                                            lines[now.weekday()] = f"{now.weekday()+ 1};{line.strip()}\n"
+                                        with open("toDo.cfg", "w", encoding="utf-8") as file:
+                                            file.writelines(lines)
+                                        continue
+                                else:
+                                    input("No plan for today nor template created...")
+                                    break
             except FileNotFoundError:
                 sys.exit()
-            ok = input()
-            if ok.lower() == "q":
-                break
-            try:
-                if int(ok.lower().split(".")[0]) <= len(tasks) and int(ok.lower().split(".")[0]) > 0:
-                    try:
+            if printed == True:
+                ok = input()
+                if ok.lower() == "q":
+                    break
+                try:
+                    if int(ok.lower().split(".")[0]) <= len(tasks) and int(ok.lower().split(".")[0]) > 0:
                         try:
-                            if listos[int(ok) - 1].split(":")[1] == "done,":
-                                listos[int(ok) - 1] = f"{listos[int(ok) - 1].split(",")[0].split(":")[0]},"
-                            else:
+                            try:
+                                if listos[int(ok) - 1].split(":")[1] == "done,":
+                                    listos[int(ok) - 1] = f"{listos[int(ok) - 1].split(",")[0].split(":")[0]},"
+                                else:
+                                    listos[int(ok) - 1] = f"{listos[int(ok) - 1].split(",")[0]}:done,"
+                            except IndexError:
                                 listos[int(ok) - 1] = f"{listos[int(ok) - 1].split(",")[0]}:done,"
+                            lino = "".join(listos)
+                            lino = f"{saved};{lino}\n"
+                            linos[saved - 1] = lino
+                            with open("toDo.cfg", "w", encoding="utf-8") as file:
+                                file.writelines(linos)
                         except IndexError:
-                            listos[int(ok) - 1] = f"{listos[int(ok) - 1].split(",")[0]}:done,"
-                        lino = "".join(listos)
-                        lino = f"{saved};{lino}\n"
-                        linos[saved - 1] = lino
-                        with open("toDo.cfg", "w", encoding="utf-8") as file:
-                            file.writelines(linos)
-                    except IndexError:
-                        input("Index Error")
-            except ValueError:
-                pass
+                            input("Index Error")
+                except ValueError:
+                    pass
     if end == "6":
         temp = ""
         while temp.lower() != "q":
